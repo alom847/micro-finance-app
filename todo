@@ -1,0 +1,26 @@
+> > TODO:
+
+[ ] APP CRASH RIGHT AFTER PUSHING TO /KYC from tabs/\_layout (after basicDetails).
+[ ] GOES BACK TO /AUTH/ IF WRONG OTP FAILED.
+[ ] Dynamic UPI VPA and QR on support page
+
+[ ] Comment Box on user profile - multiple comments at one time - only allow delete own comment
+
+[ ] APK icon background should be purple instead of white
+
+> > Frontend Changes
+
+[ ] Favicon on web
+[ ] meta description full name instead of pvt ltd
+[ ] button color change ()login/create account
+[ ] about us/ privacy policy / terms
+[ ] swiper image dynamic (also try on APK signin background)
+[ ] Logo change on frontend
+
+[ ] Admin and Manage APK clean up
+
+> > APK upload on play store
+
+<!-- Additional -->
+
+[ ] Loan Doesn't Auto Close due to floating point error because of @db.decimal(11, 2) which cause total payable sometimes eg: 13000.41 instead of 13000
