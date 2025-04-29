@@ -1,10 +1,17 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { View, Text, FlatList, RefreshControl, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  RefreshControl,
+  Pressable,
+  TextInput,
+} from "react-native";
 import { usePagination } from "../../../hooks/usePagination";
 import { GetReport, MarkAsPaid } from "../../../constants/api";
 import Toast from "react-native-toast-message";
 import LoadingOverlay from "../../../components/commons/loadingOverlay";
-import { Button, Dialog, SizableText, XStack, YStack } from "tamagui";
+import { Button, Dialog, Input, SizableText, XStack, YStack } from "tamagui";
 import { EmiRecord, User, report } from "../../../typs";
 import { blue } from "../../../utils/colors";
 import { showAsCurrency } from "../../../utils/showAsCurrency";
@@ -43,6 +50,9 @@ function Report({}: Props) {
   const [filter_to, setFilterTo] = useState<Date | null>(null);
   const filterTo = useRef<Date | null>(null);
   const [showFilter, setShowFilter] = useState(false);
+
+  const [showPaidAlert, setShowPaidAlert] = useState(false);
+  const pwdRef = useRef("");
 
   const filterReport = useCallback(async () => {
     setLoading(true);
@@ -126,6 +136,7 @@ function Report({}: Props) {
     try {
       const resp = await handleApiResponse(MarkAsPaid, [
         parseInt(id as string),
+        pwdRef.current,
       ]);
 
       if (resp.status) {
@@ -134,6 +145,8 @@ function Report({}: Props) {
           text1: resp.message,
         });
         filterReport();
+
+        setShowPaidAlert(false);
       } else {
         Toast.show({
           type: "error",
@@ -205,6 +218,34 @@ function Report({}: Props) {
         </Dialog.Portal>
       </Dialog>
 
+      <Dialog open={showPaidAlert}>
+        <Dialog.Portal>
+          <Dialog.Overlay />
+          <Dialog.Content width={"80%"}>
+            <Dialog.Title> Are you sure? </Dialog.Title>
+
+            <YStack gap={8}>
+              <Text>This will set pending amount to 0.</Text>
+              <Input
+                secureTextEntry
+                onChangeText={(value) => (pwdRef.current = value)}
+                placeholder="enter password to confirm"
+              />
+            </YStack>
+
+            <XStack gap={8} mt={8}>
+              <Button
+                variant="outlined"
+                onPress={() => setShowPaidAlert(false)}
+              >
+                Cancel
+              </Button>
+              <Button onPress={handleMarkPaid}>Confirm</Button>
+            </XStack>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog>
+
       <YStack
         backgroundColor={blue[100]}
         padding={"$3"}
@@ -222,7 +263,7 @@ function Report({}: Props) {
               {showAsCurrency(report?.pending ?? 0)}
             </Text>
 
-            <Pressable onPress={handleMarkPaid}>
+            <Pressable onPress={() => setShowPaidAlert(true)}>
               <View
                 style={{
                   width: "40%",

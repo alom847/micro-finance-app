@@ -1,10 +1,7 @@
 import axios from "axios";
 
-// const BASE_URL = "https://api.offnstudio.in/v1/api";
-const BASE_URL = "http://192.168.207.252:3000/v1/api";
-
-// const BASE_URL = "https://panel.himalayanmicrofin.in/api/native";
-// const BASE_URL = "http://192.168.1.7:3000/api/native";
+const BASE_URL = "https://api.himalayanmicrofin.in/v1/api";
+// const BASE_URL = "http://172.20.10.2:3000/v1/api";
 
 export const API = axios.create({
   baseURL: BASE_URL,
@@ -128,27 +125,27 @@ export const InitiateWithdrawalRequest = async (amount: number) => {
 // KYC
 
 export const GetKyc = async () => {
-  return API.get("/kyc");
+  return API.get("/kycs");
 };
 
 export const ResetKYC = async () => {
-  return API.post("/kyc/reset");
+  return API.post("/kycs/reset");
 };
 
 export const UpdateIDProof = async (body: FormData) => {
-  return API.post("/kyc/update-id-proof", body, {
+  return API.post("/kycs/update-id-proof", body, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 };
 
 export const UpdateAddressProof = async (body: FormData) => {
-  return API.post("/kyc/update-addr-proof", body, {
+  return API.post("/kycs/update-addr-proof", body, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 };
 
 export const UpdateSelfie = async (body: FormData) => {
-  return API.post("/kyc/update-selfie", body, {
+  return API.post("/kycs/update-selfie", body, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 };
@@ -288,13 +285,13 @@ export const CollectEMI = async (id: number, emi_data: any) => {
 };
 
 export const MakeCorrection = async (id: number, emi_data: any) => {
-  return API.post(`/repayment/${id}/correct`, {
+  return API.post(`/repayments/${id}/correct`, {
     emi_data,
   });
 };
 
 export const GetRepayment = async (id: number) => {
-  return API.get(`/repayment/${id}`);
+  return API.get(`/repayments/${id}`);
 };
 
 export const GetReport = async (
@@ -322,13 +319,15 @@ export const GetPendingReport = async (limit = 20, skip = 0) => {
   return await API.get(`report/pendings?limit=${limit}&skip=${skip}`);
 };
 
-export const MarkAsPaid = async (id: number) => {
+export const MarkAsPaid = async (id: number, pwd: string) => {
   return await API.post(`report/mark-paid`, {
     id,
+    pwd,
   });
 };
 
 //
+
 export const GetSearchResult = async (
   src_term: string,
   filter:
@@ -340,9 +339,12 @@ export const GetSearchResult = async (
     | "Loan_Pending"
     | "Deposit_Pending" = "All"
 ) => {
-  return API.get(
-    `/admin/get-search-result?src_term=${src_term}&filter=${filter}`
-  );
+  return API.get(`/search`, {
+    params: {
+      src_term,
+      filter,
+    },
+  });
 };
 
 // support

@@ -585,7 +585,7 @@ function DepositDetails({}: Props) {
       </ScrollView>
 
       {deposit?.user_id !== user?.id && deposit?.user.phone && (
-        <CallButton phoneNumber={deposit.user.phone} />
+        <CallButton phoneNumber={deposit?.user.phone} />
       )}
     </View>
   );

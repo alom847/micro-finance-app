@@ -62,6 +62,9 @@ function CollectScreen({}: Props) {
       const resp = await handleApiResponse(GetRepayment, [
         parseInt(id as string),
       ]);
+
+      console.log(resp);
+
       if (resp.status) {
         setRepayment(resp.data);
         setValue("date", new Date(resp.data.pay_date));
