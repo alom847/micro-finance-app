@@ -96,18 +96,9 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
       });
 
       if (res.status) {
-        setLoading(true);
-        setItem(res.data.token);
-        setSession(res.data.token);
-        setUser(res.data.user);
-
-        API.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${res.data.token}`;
-
         Toast.show({
           type: "success",
-          text1: "Signed Up Successfully.",
+          text1: "Signed Up Successfully. Waiting for Verification",
         });
         setLoading(false);
       } else {

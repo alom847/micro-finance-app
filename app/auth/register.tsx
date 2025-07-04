@@ -94,6 +94,7 @@ const RegisterScreen = () => {
     setLoading(true);
     try {
       await verifySignup(phone, otp);
+      router.push("/auth/verification");
     } catch (e) {
       console.log(e);
     } finally {

@@ -16,6 +16,8 @@ import { SizableText, XStack, YStack } from "tamagui";
 import { blue, green, red } from "../../../utils/colors";
 import { formatIndianPhoneNumber } from "../../../utils/formatPhone";
 import LoadingOverlay from "../../../components/commons/loadingOverlay";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import FloatingNotesBox from "@/components/FloatingNotes";
 
 type Props = {};
 
@@ -100,6 +102,13 @@ function LoanDetails({}: Props) {
                   {formateId(loan?.user_id ?? 0, "User")}
                 </Text>
               </YStack>
+
+              {loan && loan.user_id !== user?.id && (
+                <FloatingNotesBox
+                  noteType="user"
+                  noteTypeId={loan.user_id.toString()}
+                />
+              )}
             </XStack>
           </XStack>
 
@@ -332,43 +341,53 @@ function LoanDetails({}: Props) {
           >
             {["Admin", "Manager", "Agent"].includes(user?.role ?? "") &&
               user?.id !== loan?.user_id && (
-                <Pressable onPress={() => router.push(`/loans/${id}/collect`)}>
-                  <View
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      padding: 8,
-                      gap: 4,
-                    }}
+                <>
+                  <Pressable
+                    onPress={() => router.push(`/loans/${id}/collect`)}
                   >
                     <View
                       style={{
-                        backgroundColor:
-                          loan?.due?.totalDue ||
-                          loan?.due?.totalOverdue ||
-                          loan?.due?.totalPartialRemain
-                            ? red[600]
-                            : green[600],
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
-                        width: 50,
-                        height: 50,
-                        borderRadius: 50,
+                        padding: 8,
+                        gap: 4,
                       }}
                     >
-                      <FontAwesome5
-                        name="hand-holding-usd"
-                        size={28}
-                        color="white"
-                      />
+                      <View
+                        style={{
+                          backgroundColor:
+                            loan?.due?.totalDue ||
+                            loan?.due?.totalOverdue ||
+                            loan?.due?.totalPartialRemain
+                              ? red[600]
+                              : green[600],
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          width: 50,
+                          height: 50,
+                          borderRadius: 50,
+                        }}
+                      >
+                        <FontAwesome5
+                          name="hand-holding-usd"
+                          size={28}
+                          color="white"
+                        />
+                      </View>
+                      <Text style={{ textAlign: "center", fontSize: 12 }}>
+                        {"Collect \nRepayment"}
+                      </Text>
                     </View>
-                    <Text style={{ textAlign: "center", fontSize: 12 }}>
-                      {"Collect \nRepayment"}
-                    </Text>
-                  </View>
-                </Pressable>
+                  </Pressable>
+                  {loan && (
+                    <FloatingNotesBox
+                      noteType="loans"
+                      noteTypeId={loan.id.toString()}
+                    />
+                  )}
+                </>
               )}
 
             {["Admin", "Manager"].includes(user?.role ?? "") && (

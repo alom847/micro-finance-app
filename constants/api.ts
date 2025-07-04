@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const BASE_URL = "https://api.himalayanmicrofin.in/v1/api";
-// const BASE_URL = "http://172.20.10.2:3000/v1/api";
+// const BASE_URL = "http://10.0.2.2:3000/v1/api";
 
 export const API = axios.create({
   baseURL: BASE_URL,
@@ -268,8 +268,20 @@ export const GetDepositAssignments = async (
 
 // Agent
 
-export const GetAssignments = async (type = "Loan", skip = 0, limit = 10) => {
-  return API.get(`/user/assignments?type=${type}&skip=${skip}&limit=${limit}`);
+export const GetAssignments = async (
+  type = "Loan",
+  skip = 0,
+  limit = 10,
+  search = undefined
+) => {
+  return API.get(`/user/assignments`, {
+    params: {
+      type,
+      limit,
+      skip,
+      search,
+    },
+  });
 };
 
 export const CollectDepositEMI = async (id: number, emi_data: any) => {
@@ -351,4 +363,32 @@ export const GetSearchResult = async (
 
 export const GetCompanyUPIAddress = async () => {
   return API.get("/settings/company-vpas");
+};
+
+export const AddNote = async (
+  type: "user" | "loans" | "deposits" = "user",
+  id: string,
+  content: string
+) => {
+  const { data } = await API.post(`/${type}/${id}/add-note`, {
+    content,
+  });
+
+  return data;
+};
+
+export const GetNotes = async (
+  type: "user" | "loans" | "deposits" = "user",
+  id: string
+) => {
+  const { data } = await API.get(`/${type}/${id}/notes`);
+  return data;
+};
+
+export const DeleteNote = async (
+  type: "user" | "loans" | "deposits" = "user",
+  noteId: string
+) => {
+  const { data } = await API.delete(`/${type}/note/${noteId}`);
+  return data;
 };

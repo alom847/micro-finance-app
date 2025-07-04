@@ -11,6 +11,7 @@ import React, { useEffect, useState } from "react";
 import Colors from "../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { UpdateSelfie } from "../../constants/api";
 import { useSession } from "../../context/SessionContext";
@@ -45,7 +46,16 @@ const SelfieProofScreen = ({ onSubmit }: { onSubmit: () => void }) => {
       console.log("after launch request");
 
       if (!result.canceled) {
-        setImage(result.assets[0].uri);
+        const originalUri = result.assets[0].uri;
+
+        // Compress and resize
+        const manipulatedImage = await ImageManipulator.manipulateAsync(
+          originalUri,
+          [{ resize: { width: 512 } }], // Resize width to 800px (adjust as needed)
+          { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+        );
+
+        setImage(manipulatedImage.uri);
       }
     } catch (e) {
       console.log(e);

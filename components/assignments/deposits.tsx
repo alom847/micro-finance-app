@@ -63,16 +63,20 @@ function DepositAssignments({}: Props) {
     }
   }, [currentPage]);
 
-  const searchQuery = async () => {
+  const searchQuery = async (search: string | undefined) => {
     setLoading(true);
     try {
-      const resp = await handleApiResponse(GetSearchResult, [
-        searchTerm ?? "",
-        "Deposits",
+      const resp = await handleApiResponse(GetAssignments, [
+        "Deposit",
+        (currentPage - 1) * LIMIT,
+        LIMIT,
+        search,
       ]);
       if (resp.status) {
-        if (resp.data.deposits.length < LIMIT) setHasMoreData(false);
-        setDeposits(resp.data.deposits);
+        if (resp.message.deposits.length < LIMIT) setHasMoreData(false);
+
+        setDeposits(resp.message.deposits);
+        setTotalItems(resp.message.total);
       } else {
         Toast.show({ type: "error", text1: resp.message });
       }
@@ -144,7 +148,7 @@ function DepositAssignments({}: Props) {
         />
         <Theme name={"blue"}>
           <Button
-            onPress={searchQuery}
+            onPress={() => searchQuery(searchTerm)}
             theme="active"
             color={"white"}
             borderRadius={0}

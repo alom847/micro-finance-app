@@ -73,16 +73,20 @@ function LoansAssignments({}: Props) {
     }
   }, [currentPage]);
 
-  const searchQuery = async () => {
+  const searchQuery = async (search: string | undefined) => {
     setLoading(true);
     try {
-      const resp = await handleApiResponse(GetSearchResult, [
-        searchTerm ?? "",
-        "Loans",
+      const resp = await handleApiResponse(GetAssignments, [
+        "Loan",
+        (currentPage - 1) * LIMIT,
+        LIMIT,
+        search,
       ]);
+
       if (resp.status) {
-        if (resp.data.loans.length < LIMIT) setHasMoreData(false);
-        setLoans(resp.data.loans);
+        if (resp.message.loans.length < LIMIT) setHasMoreData(false);
+        setLoans(resp.message.loans);
+        setTotalItems(resp.message.total);
       } else {
         Toast.show({ type: "error", text1: resp.message });
       }
@@ -154,7 +158,7 @@ function LoansAssignments({}: Props) {
         />
         <Theme name={"blue"}>
           <Button
-            onPress={searchQuery}
+            onPress={() => searchQuery(searchTerm)}
             theme="active"
             color={"white"}
             borderRadius={0}

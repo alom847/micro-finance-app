@@ -5,11 +5,14 @@ import {
   Image,
   Dimensions,
   Pressable,
+  Alert,
+  Platform,
 } from "react-native";
 import React, { useState } from "react";
 import Colors from "../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 const { width: PAGE_WIDTH } = Dimensions.get("window");
@@ -21,8 +24,37 @@ const ProfilePicScreen = ({
 }) => {
   const [image, setImage] = useState<string | null>(null);
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+  const openCamera = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (permission.granted) {
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [3, 4],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        const originalUri = result.assets[0].uri;
+
+        // Compress and resize
+        const manipulatedImage = await ImageManipulator.manipulateAsync(
+          originalUri,
+          [{ resize: { width: 512 } }], // Resize width to 800px (adjust as needed)
+          { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+        );
+
+        setImage(manipulatedImage.uri);
+      }
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Camera permission denied",
+      });
+    }
+  };
+
+  const openLibrary = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [3, 4],
@@ -34,13 +66,21 @@ const ProfilePicScreen = ({
     }
   };
 
+  const handleImagePick = () => {
+    Alert.alert("Select Image Source", "Choose how to add your photo", [
+      { text: "Camera", onPress: openCamera },
+      { text: "Photo Library", onPress: openLibrary },
+      { text: "Cancel", style: "cancel" },
+    ]);
+  };
+
   const onStepSubmit = () => {
     if (image) {
-      onSubmit({ image: image });
+      onSubmit({ image });
     } else {
       Toast.show({
         type: "error",
-        text1: "please pick an photo.",
+        text1: "Please pick a photo.",
       });
     }
   };
@@ -52,7 +92,7 @@ const ProfilePicScreen = ({
       </Text>
 
       <Pressable
-        onPress={pickImage}
+        onPress={handleImagePick}
         style={{
           marginTop: 32,
           width: 200,
@@ -81,7 +121,6 @@ const ProfilePicScreen = ({
           justifyContent: "center",
           alignItems: "center",
           borderRadius: 32,
-
           backgroundColor: Colors.light.text,
         }}
         onPress={onStepSubmit}
